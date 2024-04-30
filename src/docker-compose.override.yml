@@ -31,6 +31,7 @@ services:
     networks:
       - back_end
       - front_end
+    command: "puma --debug -w 2"
 
 volumes:
   post_db:
