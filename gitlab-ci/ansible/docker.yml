@@ -1,0 +1,40 @@
+---
+- name: Gitlab in Docker
+  hosts: gitlab
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: 
+          - docker.io
+          - docker-compose
+        state: present
+
+    - name: Make dir gitlab config
+      file:
+        state: directory
+        path: /srv/gitlab/config
+
+    - name: Make dir gitlab data
+      file:
+        state: directory
+        path: /srv/gitlab/data
+
+    - name: Make dir gitlab logs
+      file:
+        state: directory
+        path:  /srv/gitlab/logs
+
+    - name: Copy docker-compose
+      copy:
+        src: ../files/docker-compose.yml
+        dest: /srv/gitlab/docker-compose.yml
+    
+    - name: Compose UP
+      docker_compose:
+        project_src: /srv/gitlab
+        state: present
+        restarted: yes
+        services:
+          - web
+
