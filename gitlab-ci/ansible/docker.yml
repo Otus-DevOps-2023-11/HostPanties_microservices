@@ -38,3 +38,10 @@
         services:
           - web
 
+    - name: Pause before going further
+      pause:
+        minutes: 3
+
+    - name: Lookup initial root password
+      command: docker exec gitlab_web_1 cat /etc/gitlab/initial_root_password
+      register: password_output
