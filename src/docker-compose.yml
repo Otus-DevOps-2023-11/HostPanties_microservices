@@ -1,0 +1,34 @@
+version: '3.3'
+services:
+  post_db:
+    image: mongo:${mongo_db_version}
+    volumes:
+      - post_db:/data/db
+    networks:
+      - back_end
+  ui:
+    build: ./ui
+    image: ${USERNAME}/ui:${ui_version}
+    ports:
+      - ${http_port}:9292/tcp
+    networks:
+      - front_end
+  post:
+    build: ./post-py
+    image: ${USERNAME}/post:${post_version}
+    networks:
+      - back_end
+      - front_end
+  comment:
+    build: ./comment
+    image: ${USERNAME}/comment:${comment_version}
+    networks:
+      - back_end
+      - front_end
+
+volumes:
+  post_db:
+
+networks:
+  back_end:
+  front_end:
