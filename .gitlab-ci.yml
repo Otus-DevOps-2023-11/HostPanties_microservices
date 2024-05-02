@@ -18,6 +18,14 @@ build_job:
   stage: build
   script:
     - echo 'Building'
+  environment:
+    name: build for branch/${CI_COMMIT_REF_NAME}
+    url: http://${CI_ENVIRONMENT_SLUG}.build.example.com
+  only:
+    - branches
+  except:
+    - master
+
 
 test_unit_job:
   stage: test
@@ -39,6 +47,17 @@ deploy_dev_job:
   environment:
     name: dev
     url: http://dev.example.com
+
+branch review:
+  stage: review
+  only:
+    - branches
+  except:
+    - master
+  script: echo "Deploy to $CI_ENVIRONMENT_SLUG"
+  environment:
+    name: branch/$CI_COMMIT_REF_NAME
+    url: http://$CI_ENVIRONMENT_SLUG.example.com
 
 staging:
   stage: stage
