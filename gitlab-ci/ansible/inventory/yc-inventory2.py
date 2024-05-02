@@ -18,14 +18,15 @@ vms = get_vms()
 inv2 = {}
 inv2['_meta'] = {'hostvars':{}}
 for vm in vms['instances']:
+    host_ip = vm['networkInterfaces'][0]['primaryV4Address']['oneToOneNat']['address']
     try:
         for label in vm['labels']:
             if vm['labels'][label] not in inv2:
                 inv2[vm['labels'][label]] = {'hosts': []}
-            inv2[vm['labels'][label]]['hosts'].append(vm['networkInterfaces'][0]['primaryV4Address']['oneToOneNat']['address'])
+            inv2[vm['labels'][label]]['hosts'].append(host_ip)
     except:
         if "all" not in inv2:
             inv2['all'] = {'hosts': []}
-        inv2['all']['hosts'].append(vm['networkInterfaces'][0]['primaryV4Address']['oneToOneNat']['address'])
-
+        inv2['all']['hosts'].append(host_ip)
+    inv2['_meta']['hostvars'][host_ip] = {'self_natip': host_ip}
 print(json.dumps(inv2))

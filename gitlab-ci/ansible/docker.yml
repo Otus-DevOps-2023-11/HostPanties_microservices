@@ -26,17 +26,11 @@
         path:  /srv/gitlab/logs
 
     - name: Copy docker-compose
-      copy:
-        src: ../files/docker-compose.yml
+      template:
+        src: docker-compose.yml.j2
         dest: /srv/gitlab/docker-compose.yml
-    
-    - name: Compose UP
-      docker_compose:
-        project_src: /srv/gitlab
-        state: present
-        restarted: yes
-        services:
-          - web
+      notify:
+        - Compose UP
 
     - name: Pause before going further
       pause:
@@ -45,3 +39,20 @@
     - name: Lookup initial root password
       command: docker exec gitlab_web_1 cat /etc/gitlab/initial_root_password
       register: password_output
+    
+    - name: Output password
+      debug:
+        var: password_output
+
+    - name: Output IP address of host
+      debug:
+        msg: "{{ ansible_eth0.ipv4.address }}"
+    
+  handlers:
+    - name: Compose UP
+      docker_compose:
+        project_src: /srv/gitlab
+        state: present
+        restarted: yes
+        services:
+          - web
