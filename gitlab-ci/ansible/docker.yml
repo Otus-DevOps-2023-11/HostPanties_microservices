@@ -1,0 +1,58 @@
+---
+- name: Gitlab in Docker
+  hosts: gitlab
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: 
+          - docker.io
+          - docker-compose
+        state: present
+
+    - name: Make dir gitlab config
+      file:
+        state: directory
+        path: /srv/gitlab/config
+
+    - name: Make dir gitlab data
+      file:
+        state: directory
+        path: /srv/gitlab/data
+
+    - name: Make dir gitlab logs
+      file:
+        state: directory
+        path:  /srv/gitlab/logs
+
+    - name: Copy docker-compose
+      template:
+        src: docker-compose.yml.j2
+        dest: /srv/gitlab/docker-compose.yml
+      notify:
+        - Compose UP
+
+    - name: Pause before going further
+      pause:
+        minutes: 3
+
+    - name: Lookup initial root password
+      command: docker exec gitlab_web_1 cat /etc/gitlab/initial_root_password
+      register: password_output
+    
+    - name: Output password
+      debug:
+        var: password_output
+
+    - name: Output IP address of host
+      debug:
+        msg: "{{ ansible_eth0.ipv4.address }}"
+    
+  handlers:
+    - name: Compose UP
+      docker_compose:
+        project_src: /srv/gitlab
+        state: present
+        restarted: yes
+        services:
+          - web
