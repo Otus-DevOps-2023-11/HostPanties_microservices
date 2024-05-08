@@ -1,0 +1,12 @@
+---
+- name: Run My Docker
+  hosts: all
+  become: yes
+  tasks:
+    - name: Docker run
+      community.docker.docker_container:
+        name: otus-reddit
+        image: hostpanties0x0/otus-reddit:1.0
+        state: present
+        exposed_ports:
+          - 9292

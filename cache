@@ -1,0 +1,320 @@
+GIT-RESET(1)                                                                                                         Git Manual                                                                                                        GIT-RESET(1)
+
+NNAAMMEE
+       git-reset - Reset current HEAD to the specified state
+
+SSYYNNOOPPSSIISS
+       _g_i_t _r_e_s_e_t [-q] [<tree-ish>] [--] <pathspec>...
+       _g_i_t _r_e_s_e_t [-q] [--pathspec-from-file=<file> [--pathspec-file-nul]] [<tree-ish>]
+       _g_i_t _r_e_s_e_t (--patch | -p) [<tree-ish>] [--] [<pathspec>...]
+       _g_i_t _r_e_s_e_t [--soft | --mixed [-N] | --hard | --merge | --keep] [-q] [<commit>]
+
+DDEESSCCRRIIPPTTIIOONN
+       In the first three forms, copy entries from <<ttrreeee--iisshh>> to the index. In the last form, set the current branch head (HHEEAADD) to <<ccoommmmiitt>>, optionally modifying index and working tree to match. The <<ttrreeee--iisshh>>/<<ccoommmmiitt>> defaults to HHEEAADD in all
+       forms.
+
+       _g_i_t _r_e_s_e_t [-q] [<tree-ish>] [--] <pathspec>..., _g_i_t _r_e_s_e_t [-q] [--pathspec-from-file=<file> [--pathspec-file-nul]] [<tree-ish>]
+           These forms reset the index entries for all paths that match the <<ppaatthhssppeecc>> to their state at <<ttrreeee--iisshh>>. (It does not affect the working tree or the current branch.)
+
+           This means that ggiitt rreesseett <<ppaatthhssppeecc>> is the opposite of ggiitt aadddd <<ppaatthhssppeecc>>. This command is equivalent to ggiitt rreessttoorree [[----ssoouurrccee==<<ttrreeee--iisshh>>]] ----ssttaaggeedd <<ppaatthhssppeecc>>.......
+
+           After running ggiitt rreesseett <<ppaatthhssppeecc>> to update the index entry, you can use ggiitt--rreessttoorree(1) to check the contents out of the index to the working tree. Alternatively, using ggiitt--rreessttoorree(1) and specifying a commit with ----ssoouurrccee, you can
+           copy the contents of a path out of a commit to the index and to the working tree in one go.
+
+       _g_i_t _r_e_s_e_t (--patch | -p) [<tree-ish>] [--] [<pathspec>...]
+           Interactively select hunks in the difference between the index and <<ttrreeee--iisshh>> (defaults to HHEEAADD). The chosen hunks are applied in reverse to the index.
+
+           This means that ggiitt rreesseett --pp is the opposite of ggiitt aadddd --pp, i.e. you can use it to selectively reset hunks. See the “Interactive Mode” section of ggiitt--aadddd(1) to learn how to operate the ----ppaattcchh mode.
+
+       _g_i_t _r_e_s_e_t [<mode>] [<commit>]
+           This form resets the current branch head to <<ccoommmmiitt>> and possibly updates the index (resetting it to the tree of <<ccoommmmiitt>>) and the working tree depending on <<mmooddee>>. If <<mmooddee>> is omitted, defaults to ----mmiixxeedd. The <<mmooddee>> must be one
+           of the following:
+
+           --soft
+               Does not touch the index file or the working tree at all (but resets the head to <<ccoommmmiitt>>, just like all modes do). This leaves all your changed files "Changes to be committed", as ggiitt ssttaattuuss would put it.
+
+           --mixed
+               Resets the index but not the working tree (i.e., the changed files are preserved but not marked for commit) and reports what has not been updated. This is the default action.
+
+               If --NN is specified, removed paths are marked as intent-to-add (see ggiitt--aadddd(1)).
+
+           --hard
+               Resets the index and working tree. Any changes to tracked files in the working tree since <<ccoommmmiitt>> are discarded. Any untracked files or directories in the way of writing any tracked files are simply deleted.
+
+           --merge
+               Resets the index and updates the files in the working tree that are different between <<ccoommmmiitt>> and HHEEAADD, but keeps those which are different between the index and working tree (i.e. which have changes which have not been added).
+               If a file that is different between <<ccoommmmiitt>> and the index has unstaged changes, reset is aborted.
+
+               In other words, ----mmeerrggee does something like a ggiitt rreeaadd--ttrreeee --uu --mm <<ccoommmmiitt>>, but carries forward unmerged index entries.
+
+           --keep
+               Resets index entries and updates files in the working tree that are different between <<ccoommmmiitt>> and HHEEAADD. If a file that is different between <<ccoommmmiitt>> and HHEEAADD has local changes, reset is aborted.
+
+           --[no-]recurse-submodules
+               When the working tree is updated, using --recurse-submodules will also recursively reset the working tree of all active submodules according to the commit recorded in the superproject, also setting the submodules' HEAD to be
+               detached at that commit.
+
+       See "Reset, restore and revert" in ggiitt(1) for the differences between the three commands.
+
+OOPPTTIIOONNSS
+       -q, --quiet
+           Be quiet, only report errors.
+
+       --refresh, --no-refresh
+           Refresh the index after a mixed reset. Enabled by default.
+
+       --pathspec-from-file=<file>
+           Pathspec is passed in <<ffiillee>> instead of commandline args. If <<ffiillee>> is exactly -- then standard input is used. Pathspec elements are separated by LF or CR/LF. Pathspec elements can be quoted as explained for the configuration
+           variable ccoorree..qquuootteePPaatthh (see ggiitt--ccoonnffiigg(1)). See also ----ppaatthhssppeecc--ffiillee--nnuull and global ----lliitteerraall--ppaatthhssppeeccss.
+
+       --pathspec-file-nul
+           Only meaningful with ----ppaatthhssppeecc--ffrroomm--ffiillee. Pathspec elements are separated with NUL character and all other characters are taken literally (including newlines and quotes).
+
+       --
+           Do not interpret any more arguments as options.
+
+       <pathspec>...
+           Limits the paths affected by the operation.
+
+           For more details, see the _p_a_t_h_s_p_e_c entry in ggiittgglloossssaarryy(7).
+
+EEXXAAMMPPLLEESS
+       Undo add
+
+               $ edit                                     ((11))
+               $ git add frotz.c filfre.c
+               $ mailx                                    ((22))
+               $ git reset                                ((33))
+               $ git pull git://info.example.com/ nitfol  ((44))
+
+           11.. You are happily working on something, and find the changes in these files are in good order. You do not want to see them when you run ggiitt ddiiffff, because you plan to work on other files and changes with these files are distracting.
+           22.. Somebody asks you to pull, and the changes sound worthy of merging.
+           33.. However, you already dirtied the index (i.e. your index does not match the HHEEAADD commit). But you know the pull you are going to make does not affect ffrroottzz..cc or ffiillffrree..cc, so you revert the index changes for these two files. Your
+           changes in working tree remain there.
+           44.. Then you can pull and merge, leaving ffrroottzz..cc and ffiillffrree..cc changes still in the working tree.
+
+       Undo a commit and redo
+
+               $ git commit ...
+               $ git reset --soft HEAD^      ((11))
+               $ edit                        ((22))
+               $ git commit -a -c ORIG_HEAD  ((33))
+
+           11.. This is most often done when you remembered what you just committed is incomplete, or you misspelled your commit message, or both. Leaves working tree as it was before "reset".
+           22.. Make corrections to working tree files.
+           33.. "reset" copies the old head to ..ggiitt//OORRIIGG__HHEEAADD; redo the commit by starting with its log message. If you do not need to edit the message further, you can give --CC option instead.
+
+           See also the ----aammeenndd option to ggiitt--ccoommmmiitt(1).
+
+       Undo a commit, making it a topic branch
+
+               $ git branch topic/wip          ((11))
+               $ git reset --hard HEAD~3       ((22))
+               $ git switch topic/wip          ((33))
+
+           11.. You have made some commits, but realize they were premature to be in the mmaasstteerr branch. You want to continue polishing them in a topic branch, so create ttooppiicc//wwiipp branch off of the current HHEEAADD.
+           22.. Rewind the master branch to get rid of those three commits.
+           33.. Switch to ttooppiicc//wwiipp branch and keep working.
+
+       Undo commits permanently
+
+               $ git commit ...
+               $ git reset --hard HEAD~3   ((11))
+
+           11.. The last three commits (HHEEAADD, HHEEAADD^^, and HHEEAADD~~22) were bad and you do not want to ever see them again. Do nnoott do this if you have already given these commits to somebody else. (See the "RECOVERING FROM UPSTREAM REBASE" section in
+           ggiitt--rreebbaassee(1) for the implications of doing so.)
+
+       Undo a merge or pull
+
+               $ git pull                         ((11))
+               Auto-merging nitfol
+               CONFLICT (content): Merge conflict in nitfol
+               Automatic merge failed; fix conflicts and then commit the result.
+               $ git reset --hard                 ((22))
+               $ git pull . topic/branch          ((33))
+               Updating from 41223... to 13134...
+               Fast-forward
+               $ git reset --hard ORIG_HEAD       ((44))
+
+           11.. Try to update from the upstream resulted in a lot of conflicts; you were not ready to spend a lot of time merging right now, so you decide to do that later.
+           22.. "pull" has not made merge commit, so ggiitt rreesseett ----hhaarrdd which is a synonym for ggiitt rreesseett ----hhaarrdd HHEEAADD clears the mess from the index file and the working tree.
+           33.. Merge a topic branch into the current branch, which resulted in a fast-forward.
+           44.. But you decided that the topic branch is not ready for public consumption yet. "pull" or "merge" always leaves the original tip of the current branch in OORRIIGG__HHEEAADD, so resetting hard to it brings your index file and the working
+           tree back to that state, and resets the tip of the branch to that commit.
+
+       Undo a merge or pull inside a dirty working tree
+
+               $ git pull                         ((11))
+               Auto-merging nitfol
+               Merge made by recursive.
+                nitfol                |   20 +++++----
+                ...
+               $ git reset --merge ORIG_HEAD      ((22))
+
+           11.. Even if you may have local modifications in your working tree, you can safely say ggiitt ppuullll when you know that the change in the other branch does not overlap with them.
+           22.. After inspecting the result of the merge, you may find that the change in the other branch is unsatisfactory. Running ggiitt rreesseett ----hhaarrdd OORRIIGG__HHEEAADD will let you go back to where you were, but it will discard your local changes,
+           which you do not want.  ggiitt rreesseett ----mmeerrggee keeps your local changes.
+
+       Interrupted workflow
+           Suppose you are interrupted by an urgent fix request while you are in the middle of a large change. The files in your working tree are not in any shape to be committed yet, but you need to get to the other branch for a quick bugfix.
+
+               $ git switch feature  ;# you were working in "feature" branch and
+               $ work work work      ;# got interrupted
+               $ git commit -a -m "snapshot WIP"                 ((11))
+               $ git switch master
+               $ fix fix fix
+               $ git commit ;# commit with real log
+               $ git switch feature
+               $ git reset --soft HEAD^ ;# go back to WIP state  ((22))
+               $ git reset                                       ((33))
+
+           11.. This commit will get blown away so a throw-away log message is OK.
+           22.. This removes the _W_I_P commit from the commit history, and sets your working tree to the state just before you made that snapshot.
+           33.. At this point the index file still has all the WIP changes you committed as _s_n_a_p_s_h_o_t _W_I_P. This updates the index to show your WIP files as uncommitted.
+
+           See also ggiitt--ssttaasshh(1).
+
+       Reset a single file in the index
+           Suppose you have added a file to your index, but later decide you do not want to add it to your commit. You can remove the file from the index while keeping your changes with git reset.
+
+               $ git reset -- frotz.c                      ((11))
+               $ git commit -m "Commit files in index"     ((22))
+               $ git add frotz.c                           ((33))
+
+           11.. This removes the file from the index while keeping it in the working directory.
+           22.. This commits all other changes in the index.
+           33.. Adds the file to the index again.
+
+       Keep changes in working tree while discarding some previous commits
+           Suppose you are working on something and you commit it, and then you continue working a bit more, but now you think that what you have in your working tree should be in another branch that has nothing to do with what you committed
+           previously. You can start a new branch and reset it while keeping the changes in your working tree.
+
+               $ git tag start
+               $ git switch -c branch1
+               $ edit
+               $ git commit ...                            ((11))
+               $ edit
+               $ git switch -c branch2                     ((22))
+               $ git reset --keep start                    ((33))
+
+           11.. This commits your first edits in bbrraanncchh11.
+           22.. In the ideal world, you could have realized that the earlier commit did not belong to the new topic when you created and switched to bbrraanncchh22 (i.e.  ggiitt sswwiittcchh --cc bbrraanncchh22 ssttaarrtt), but nobody is perfect.
+           33.. But you can use rreesseett ----kkeeeepp to remove the unwanted commit after you switched to bbrraanncchh22.
+
+       Split a commit apart into a sequence of commits
+           Suppose that you have created lots of logically separate changes and committed them together. Then, later you decide that it might be better to have each logical chunk associated with its own commit. You can use git reset to rewind
+           history without changing the contents of your local files, and then successively use ggiitt aadddd --pp to interactively select which hunks to include into each commit, using ggiitt ccoommmmiitt --cc to pre-populate the commit message.
+
+               $ git reset -N HEAD^                        ((11))
+               $ git add -p                                ((22))
+               $ git diff --cached                         ((33))
+               $ git commit -c HEAD@{1}                    ((44))
+               ...                                         ((55))
+               $ git add ...                               ((66))
+               $ git diff --cached                         ((77))
+               $ git commit ...                            ((88))
+
+           11.. First, reset the history back one commit so that we remove the original commit, but leave the working tree with all the changes. The -N ensures that any new files added with HHEEAADD are still marked so that ggiitt aadddd --pp will find
+           them.
+           22.. Next, we interactively select diff hunks to add using the ggiitt aadddd --pp facility. This will ask you about each diff hunk in sequence and you can use simple commands such as "yes, include this", "No don’t include this" or even the
+           very powerful "edit" facility.
+           33.. Once satisfied with the hunks you want to include, you should verify what has been prepared for the first commit by using ggiitt ddiiffff ----ccaacchheedd. This shows all the changes that have been moved into the index and are about to be
+           committed.
+           44.. Next, commit the changes stored in the index. The --cc option specifies to pre-populate the commit message from the original message that you started with in the first commit. This is helpful to avoid retyping it. The HHEEAADD@@{{11}} is a
+           special notation for the commit that HHEEAADD used to be at prior to the original reset commit (1 change ago). See ggiitt--rreefflloogg(1) for more details. You may also use any other valid commit reference.
+           55.. You can repeat steps 2-4 multiple times to break the original code into any number of commits.
+           66.. Now you’ve split out many of the changes into their own commits, and might no longer use the patch mode of ggiitt aadddd, in order to select all remaining uncommitted changes.
+           77.. Once again, check to verify that you’ve included what you want to. You may also wish to verify that git diff doesn’t show any remaining changes to be committed later.
+           88.. And finally create the final commit.
+
+DDIISSCCUUSSSSIIOONN
+       The tables below show what happens when running:
+
+           git reset --option target
+
+       to reset the HHEEAADD to another commit (ttaarrggeett) with the different reset options depending on the state of the files.
+
+       In these tables, AA, BB, CC and DD are some different states of a file. For example, the first line of the first table means that if a file is in state AA in the working tree, in state BB in the index, in state CC in HHEEAADD and in state DD in the
+       target, then ggiitt rreesseett ----ssoofftt ttaarrggeett will leave the file in the working tree in state AA and in the index in state BB. It resets (i.e. moves) the HHEEAADD (i.e. the tip of the current branch, if you are on one) to ttaarrggeett (which has the file
+       in state DD).
+
+           working index HEAD target         working index HEAD
+           ----------------------------------------------------
+            A       B     C    D     --soft   A       B     D
+                                     --mixed  A       D     D
+                                     --hard   D       D     D
+                                     --merge (disallowed)
+                                     --keep  (disallowed)
+
+           working index HEAD target         working index HEAD
+           ----------------------------------------------------
+            A       B     C    C     --soft   A       B     C
+                                     --mixed  A       C     C
+                                     --hard   C       C     C
+                                     --merge (disallowed)
+                                     --keep   A       C     C
+
+           working index HEAD target         working index HEAD
+           ----------------------------------------------------
+            B       B     C    D     --soft   B       B     D
+                                     --mixed  B       D     D
+                                     --hard   D       D     D
+                                     --merge  D       D     D
+                                     --keep  (disallowed)
+
+           working index HEAD target         working index HEAD
+           ----------------------------------------------------
+            B       B     C    C     --soft   B       B     C
+                                     --mixed  B       C     C
+                                     --hard   C       C     C
+                                     --merge  C       C     C
+                                     --keep   B       C     C
+
+           working index HEAD target         working index HEAD
+           ----------------------------------------------------
+            B       C     C    D     --soft   B       C     D
+                                     --mixed  B       D     D
+                                     --hard   D       D     D
+                                     --merge (disallowed)
+                                     --keep  (disallowed)
+
+           working index HEAD target         working index HEAD
+           ----------------------------------------------------
+            B       C     C    C     --soft   B       C     C
+                                     --mixed  B       C     C
+                                     --hard   C       C     C
+                                     --merge  B       C     C
+                                     --keep   B       C     C
+
+       rreesseett ----mmeerrggee is meant to be used when resetting out of a conflicted merge. Any mergy operation guarantees that the working tree file that is involved in the merge does not have a local change with respect to the index before it starts,
+       and that it writes the result out to the working tree. So if we see some difference between the index and the target and also between the index and the working tree, then it means that we are not resetting out from a state that a mergy
+       operation left after failing with a conflict. That is why we disallow ----mmeerrggee option in this case.
+
+       rreesseett ----kkeeeepp is meant to be used when removing some of the last commits in the current branch while keeping changes in the working tree. If there could be conflicts between the changes in the commit we want to remove and the changes in
+       the working tree we want to keep, the reset is disallowed. That’s why it is disallowed if there are both changes between the working tree and HHEEAADD, and between HHEEAADD and the target. To be safe, it is also disallowed when there are
+       unmerged entries.
+
+       The following tables show what happens when there are unmerged entries:
+
+           working index HEAD target         working index HEAD
+           ----------------------------------------------------
+            X       U     A    B     --soft  (disallowed)
+                                     --mixed  X       B     B
+                                     --hard   B       B     B
+                                     --merge  B       B     B
+                                     --keep  (disallowed)
+
+           working index HEAD target         working index HEAD
+           ----------------------------------------------------
+            X       U     A    A     --soft  (disallowed)
+                                     --mixed  X       A     A
+                                     --hard   A       A     A
+                                     --merge  A       A     A
+                                     --keep  (disallowed)
+
+       XX means any state and UU means an unmerged index.
+
+GGIITT
+       Part of the ggiitt(1) suite
+
+Git 2.39.2                                                                                                           02/28/2023                                                                                                        GIT-RESET(1)
