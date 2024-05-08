@@ -1,0 +1,80 @@
+version: '3.3'
+services:
+  post_db:
+    image: mongo:${mongo_db_version}
+    volumes:
+      - post_db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${mongo_user}
+      MONGO_INITDB_ROOT_PASSWORD: ${mongo_password}
+    networks:
+      - back_end
+
+  ui:
+    build: ./ui
+    image: ${USERNAME}/ui:${ui_version}
+    ports:
+      - ${http_port}:9292/tcp
+    networks:
+      - front_end
+
+  post:
+    build: ./post-py
+    image: ${USERNAME}/post:${post_version}
+    networks:
+      - back_end
+      - front_end
+
+  comment:
+    build: ./comment
+    image: ${USERNAME}/comment:${comment_version}
+    networks:
+      - back_end
+      - front_end
+
+  prometheus:
+    image: ${USERNAME}/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=1d'
+    networks:
+      - back_end
+      - front_end
+
+  node-exporter:
+    image: prom/node-exporter
+    user: root
+    networks:
+      - back_end
+    ports:
+      - 9100:9100
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+
+  mongo-exporter:
+    image: percona/mongodb_exporter:${mongo_exporter_ver}
+    ports:
+      - 9216:9216
+    command:
+      - '--mongodb.uri=mongodb://${mongo_user}:${mongo_password}@post_db:27017/admin?ssl=true'
+    networks:
+      - back_end
+
+volumes:
+  post_db:
+  prometheus_data:
+
+networks:
+  back_end:
+  front_end:

@@ -1,0 +1,10 @@
+REPOSITORY                    TAG       IMAGE ID       CREATED              SIZE
+HostPanties/ubuntu-tmp-file   latest    a9ac5e78a39e   About a minute ago   63.2MB
+ubuntu                        18.04     f9a80a55f492   10 months ago        63.2MB
+hello-world                   latest    d2c94e258dcb   11 months ago        13.3kB
+
+# Отличия image от container
+container:
+- Имеет параметры запуска, выделеных ресурсов. Есть сетевой интерфейс.
+image:
+- Не имеет вышеперечисленных параметров.

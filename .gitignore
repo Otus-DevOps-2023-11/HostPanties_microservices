@@ -2,3 +2,5 @@ terraform.tfvars
 .terraform/
 variables.json
 __pycache__/
+docker/.env
+!docker/.env.example
