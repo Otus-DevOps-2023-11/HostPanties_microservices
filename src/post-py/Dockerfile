@@ -5,7 +5,7 @@ ADD . /app
 
 RUN apk update \
   && apk add -y build-base \
-  && pip install -r /app/requirements.txt
+  && pip install --trusted-host pypi.org --trusted-host pypi.python.org -r /app/requirements.txt
 
 ENV POST_DATABASE_HOST post_db
 ENV POST_DATABASE posts
