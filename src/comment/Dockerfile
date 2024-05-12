@@ -9,6 +9,8 @@ ENV COMMENT_DATABASE comments
 
 WORKDIR $APP_HOME 
 COPY . $APP_HOME/
+RUN bundle install 
+RUN bundle update bson
 RUN bundle install
 
 CMD ["puma"]

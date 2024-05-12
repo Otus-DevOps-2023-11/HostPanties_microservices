@@ -12,8 +12,7 @@ resource "yandex_compute_instance" "monolith" {
   zone        = var.zone
   
   labels = {
-    tags = "monolith"
-    env = "docker"
+    tags = "docker-m"
   }
 
   resources {
@@ -27,7 +26,7 @@ resource "yandex_compute_instance" "monolith" {
 
   network_interface {
     subnet_id = var.subnet_id
-    nat = true
+
   }
 
   metadata = {
